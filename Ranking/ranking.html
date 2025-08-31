@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rankings - Evolução Educacional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Adicionado para garantir que o fundo funcione corretamente */
+        body {
+            background-color: #0F0F1A; /* Cor de fundo base */
+        }
+        #art-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Coloca o fundo atrás de todo o conteúdo */
+        }
+        .ranking-wrapper {
+            position: relative; /* Garante que o conteúdo fique sobre o fundo */
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="art-background"></canvas>
+
+    <a href="../Enem/menu.html" class="back-btn"><i class="fas fa-chevron-left"></i> Voltar</a>
+
+    <div class="ranking-wrapper">
+        <div class="header-content">
+            <h1 id="ranking-title">Liga Bronze</h1>
+            <div class="user-podium-info">
+                <span id="user-position"></span>
+                <span id="user-league"></span>
+            </div>
+        </div>
+
+        <div class="ranking-tabs">
+            <button class="tab-btn active" data-ranking-type="league">Liga</button>
+            <button class="tab-btn" data-ranking-type="simulation">Simulado</button>
+            <button class="tab-btn" data-ranking-type="redaction">Redação</button>
+        </div>
+        
+        <div class="loading-indicator">
+            <div class="spinner"></div>
+        </div>
+
+        <ul class="ranking-list" id="ranking-list"></ul>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="index.js"></script>
+
+    <script>
+        const canvas = document.getElementById('art-background');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = `hsl(${Math.random() * 60 + 200}, 70%, 50%)`; // Tons de azul/roxo
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 12000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connect();
+            requestAnimationFrame(animate);
+        }
+
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = Math.hypot(particlesArray[a].x - particlesArray[b].x, particlesArray[a].y - particlesArray[b].y);
+                    if (distance < 120) {
+                        opacityValue = 1 - (distance / 120);
+                        ctx.strokeStyle = `rgba(200, 220, 255, ${opacityValue})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        init();
+        animate();
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            init();
+        });
+    </script>
+</body>
+</html>

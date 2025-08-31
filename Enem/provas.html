@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provas e Vestibulares | Evolução Educacional</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --cor-fundo: #0F0F1A;
+            --cor-texto: #EAEAEA;
+            --cor-container: rgba(26, 26, 46, 0.6);
+            --cor-borda: rgba(255, 255, 255, 0.1);
+            
+            /* Novas cores para cada vestibular */
+            --cor-enem: #FFD700;   /* Dourado */
+            --cor-fuvest: #00A8FF;  /* Azul */
+            --cor-fatec: #e74c3c;   /* Vermelho */
+            --cor-ifsp: #27ae60;   /* Verde */
+            --cor-ita: #8e44ad;    /* Roxo */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto; /* Permite scroll se necessário */
+            padding: 20px;
+        }
+
+        #art-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            background-color: var(--cor-container);
+            color: var(--cor-texto);
+            border: 1px solid var(--cor-borda);
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .back-btn:hover {
+            background-color: var(--cor-borda);
+            transform: scale(1.05);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+        }
+        
+        .exams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .exam-card {
+            background: var(--cor-container);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--cor-borda);
+            border-left: 5px solid; /* Borda colorida */
+            padding: 30px;
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            
+            text-decoration: none;
+            color: var(--cor-texto);
+            
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .exam-card .icon {
+            width: 50px;
+            height: 50px;
+            stroke-width: 1.5;
+        }
+
+        .exam-card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .exam-card p {
+            font-size: 0.9rem;
+            text-align: center;
+            color: #bdc3c7;
+            line-height: 1.5;
+        }
+
+        .exam-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Cores específicas para cada cartão */
+        #enem { border-left-color: var(--cor-enem); }
+        #enem:hover { border-color: var(--cor-enem); box-shadow: 0 0 25px color-mix(in srgb, var(--cor-enem), transparent 50%); }
+        
+        #fuvest { border-left-color: var(--cor-fuvest); }
+        #fuvest:hover { border-color: var(--cor-fuvest); box-shadow: 0 0 25px color-mix(in srgb, var(--cor-fuvest), transparent 50%); }
+
+        #fatec { border-left-color: var(--cor-fatec); }
+        #fatec:hover { border-color: var(--cor-fatec); box-shadow: 0 0 25px color-mix(in srgb, var(--cor-fatec), transparent 50%); }
+
+        #ifsp { border-left-color: var(--cor-ifsp); }
+        #ifsp:hover { border-color: var(--cor-ifsp); box-shadow: 0 0 25px color-mix(in srgb, var(--cor-ifsp), transparent 50%); }
+
+        #ita { border-left-color: var(--cor-ita); }
+        #ita:hover { border-color: var(--cor-ita); box-shadow: 0 0 25px color-mix(in srgb, var(--cor-ita), transparent 50%); }
+        
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.2rem; }
+            .back-btn { top: 1rem; left: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="art-background"></canvas>
+    
+    <a href="menu.html" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <span>Voltar</span>
+    </a>
+    
+    <header>
+        <h1>Provas e Vestibulares</h1>
+    </header>
+
+    <main class="exams-grid">
+        <a href="#" class="exam-card" id="enem">
+            <svg class="icon" style="stroke: var(--cor-enem);" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+            <h2>ENEM</h2>
+            <p>Exame Nacional do Ensino Médio, a principal porta de entrada para universidades públicas e privadas no Brasil.</p>
+        </a>
+
+        <a href="#" class="exam-card" id="enem">
+            <svg class="icon" style="stroke: var(--cor-enem);" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+            <h2>SIMULADOS ETEC</h2>
+            <p>Exames diagnosticos do Ensino Médio, a principal forma de acompanhar o estudo dos alunos.</p>
+        </a>
+
+        <a href="#" class="exam-card" id="fuvest">
+            <svg class="icon" style="stroke: var(--cor-fuvest);" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0l-2.072 2.072a50.57 50.57 0 002.658.813m15.482 0l2.072 2.072a50.57 50.57 0 01-2.658.813" /></svg>
+            <h2>FUVEST (USP)</h2>
+            <p>Vestibular da Universidade de São Paulo, um dos mais concorridos e prestigiados do país.</p>
+        </a>
+
+        <a href="#" class="exam-card" id="fatec">
+            <svg class="icon" style="stroke: var(--cor-fatec);" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-1.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h9.75a2.25 2.25 0 012.25 2.25z" /></svg>
+            <h2>FATEC</h2>
+            <p>Processo seletivo para as Faculdades de Tecnologia do Estado de São Paulo, focado em cursos superiores de tecnologia.</p>
+        </a>
+        
+        <a href="#" class="exam-card" id="ifsp">
+            <svg class="icon" style="stroke: var(--cor-ifsp);" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
+            <h2>IFSP</h2>
+            <p>Exames do Instituto Federal de São Paulo, oferecendo cursos técnicos, de graduação e pós-graduação.</p>
+        </a>
+
+        <a href="#" class="exam-card" id="ita">
+            <svg class="icon" style="stroke: var(--cor-ita);" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+            <h2>ITA</h2>
+            <p>Vestibular do Instituto Tecnológico de Aeronáutica, conhecido por seu altíssimo nível de dificuldade e excelência.</p>
+        </a>
+    </main>
+
+    <script>
+        // --- Animação do Canvas (Fundo) ---
+        const canvas = document.getElementById('art-background');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particlesArray;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = `hsl(${Math.random() * 300 + 180}, 70%, 50%)`;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 15000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+        function animate() {
+            ctx.fillStyle = 'rgba(15, 15, 26, 0.2)'; // Efeito de rastro
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+        init();
+        animate();
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+    </script>
+</body>
+</html>

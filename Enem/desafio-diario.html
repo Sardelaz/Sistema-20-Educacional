@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio Diário | Evolução Educacional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cor-fundo: #0F0F1A;
+            --cor-texto: #EAEAEA;
+            --cor-container: rgba(26, 26, 46, 0.8);
+            --cor-borda: rgba(255, 255, 255, 0.15);
+            --cor-desafio: #FFD700;
+            --cor-progresso: #27ae60;
+            --cor-destaque: #00A8FF;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        #art-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background-color: var(--cor-container);
+            border: 1px solid var(--cor-borda);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--cor-borda);
+            color: var(--cor-texto);
+            padding: 8px 15px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover { background-color: var(--cor-destaque); color: var(--cor-fundo); }
+        
+        h1 {
+            font-size: 2.8rem;
+            color: var(--cor-desafio);
+            text-shadow: 0 0 15px var(--cor-desafio);
+            margin-bottom: 15px;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #bdc3c7;
+            margin-bottom: 40px;
+        }
+        .progress-container {
+            margin-bottom: 30px;
+        }
+        .progress-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .progress-bar-background {
+            width: 100%;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 50px;
+            padding: 5px;
+            border: 1px solid var(--cor-borda);
+        }
+        .progress-bar-fill {
+            width: 0%; /* Começa em 0 */
+            height: 100%;
+            background-color: var(--cor-progresso);
+            border-radius: 50px;
+            transition: width 0.5s ease-in-out;
+            box-shadow: 0 0 15px var(--cor-progresso);
+        }
+        #claim-reward-btn {
+            background-color: var(--cor-desafio);
+            color: var(--cor-fundo);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        #claim-reward-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--cor-desafio);
+        }
+        #claim-reward-btn:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .reward-claimed-message {
+            font-weight: 600;
+            color: var(--cor-progresso);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="art-background"></canvas>
+    
+    <div class="container">
+        <a href="menu.html" class="back-btn">Voltar</a>
+        <h1>Desafio Diário</h1>
+        <p class="subtitle">Ganhe 30 XP hoje para receber a sua recompensa!</p>
+
+        <div class="progress-container">
+            <p class="progress-label">Progresso: <span id="xp-progress-text">0 / 30 XP</span></p>
+            <div class="progress-bar-background">
+                <div id="progress-bar" class="progress-bar-fill"></div>
+            </div>
+        </div>
+
+        <div id="reward-section">
+            <button id="claim-reward-btn" disabled>Atinga a meta</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdvqFpKHpguqUcnkreu5nYotqtdDzzHY4",
+            authDomain: "evolucao-educacional.firebaseapp.com",
+            projectId: "evolucao-educacional",
+            storageBucket: "evolucao-educacional.appspot.com",
+            messagingSenderId: "841004951746",
+            appId: "1:841004951746:web:44a6f884840b35f415335b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressBar = document.getElementById('progress-bar');
+            const xpProgressText = document.getElementById('xp-progress-text');
+            const claimBtn = document.getElementById('claim-reward-btn');
+            const rewardSection = document.getElementById('reward-section');
+
+            const DAILY_GOAL = 30;
+            const REWARD_XP = 50;
+
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    const userRef = db.collection('users').doc(user.uid);
+                    
+                    // onSnapshot ouve as alterações em tempo real
+                    userRef.onSnapshot(doc => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            updateChallengeUI(userData);
+                        }
+                    });
+                } else {
+                    window.location.href = '../index.html';
+                }
+            });
+
+            function updateChallengeUI(userData) {
+                const today = new Date().toISOString().slice(0, 10); // Formato AAAA-MM-DD
+                const dailyXp = userData.dailyXp && userData.dailyXp[today] ? userData.dailyXp[today].xp : 0;
+                const rewardClaimed = userData.dailyXp && userData.dailyXp[today] ? userData.dailyXp[today].rewardClaimed : false;
+
+                // Atualiza a barra de progresso
+                const progress = Math.min((dailyXp / DAILY_GOAL) * 100, 100);
+                progressBar.style.width = `${progress}%`;
+                xpProgressText.textContent = `${dailyXp} / ${DAILY_GOAL} XP`;
+
+                if (rewardClaimed) {
+                    rewardSection.innerHTML = `<p class="reward-claimed-message">Recompensa de hoje já resgatada. Volte amanhã!</p>`;
+                } else if (dailyXp >= DAILY_GOAL) {
+                    claimBtn.disabled = false;
+                    claimBtn.textContent = `Resgatar ${REWARD_XP} XP`;
+                } else {
+                    claimBtn.disabled = true;
+                    claimBtn.textContent = 'Atinga a meta';
+                }
+            }
+
+            claimBtn.addEventListener('click', async () => {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                claimBtn.disabled = true;
+                claimBtn.textContent = "A resgatar...";
+
+                const userRef = db.collection('users').doc(user.uid);
+                const today = new Date().toISOString().slice(0, 10);
+
+                try {
+                    await userRef.update({
+                        totalXp: firebase.firestore.FieldValue.increment(REWARD_XP),
+                        weeklyXp: firebase.firestore.FieldValue.increment(REWARD_XP),
+                        [`dailyXp.${today}.rewardClaimed`]: true
+                    });
+                    console.log("Recompensa resgatada com sucesso!");
+                } catch (error) {
+                    console.error("Erro ao resgatar recompensa:", error);
+                    alert("Ocorreu um erro. Tente novamente.");
+                    claimBtn.disabled = false; // Reabilita o botão em caso de erro
+                }
+            });
+        });
+
+        // --- Animação do Canvas (Fundo Espacial) ---
+        const canvas = document.getElementById('art-background');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+        function setCanvasSize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        setCanvasSize();
+        class Particle { constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 1.5 + 0.5; this.speedX = Math.random() * 2 - 1; this.speedY = Math.random() * 2 - 1; this.color = `hsl(${Math.random() * 360}, 70%, 50%)`; } update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width || this.x < 0) this.speedX *= -1; if (this.y > canvas.height || this.y < 0) this.speedY *= -1; } draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+        function init() { particlesArray = []; let n = (canvas.height * canvas.width) / 9000; for (let i = 0; i < n; i++) { particlesArray.push(new Particle()); } }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); } requestAnimationFrame(animate); }
+        init();
+        animate();
+        window.addEventListener('resize', () => { setCanvasSize(); init(); });
+    </script>
+</body>
+</html>

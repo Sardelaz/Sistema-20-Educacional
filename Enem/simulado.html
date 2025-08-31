@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado ENEM | Evolução Educacional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cor-fundo: #0F0F1A;
+            --cor-texto: #EAEAEA;
+            --cor-container: rgba(26, 26, 46, 0.8);
+            --cor-borda: rgba(255, 255, 255, 0.15);
+            --cor-simulado: #e74c3c;
+            --cor-destaque: #00A8FF;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            overflow-y: auto;
+        }
+        /* Estilos do fundo animado */
+        #art-background { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: -1; 
+            background-color: var(--cor-fundo); /* Garante o fundo base */
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            position: relative; /* Para garantir que o conteúdo fique acima do canvas */
+            z-index: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--cor-container);
+            border-radius: 12px;
+            border: 1px solid var(--cor-borda);
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 2rem; color: var(--cor-simulado); }
+        .timer-box { text-align: center; }
+        .timer-box #timer { font-size: 2.5rem; font-weight: 700; color: var(--cor-destaque); }
+        .back-btn {
+            background: var(--cor-borda);
+            color: var(--cor-texto);
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover { background-color: var(--cor-destaque); color: var(--cor-fundo); }
+
+        .intro-screen { text-align: center; padding: 50px 20px; background-color: var(--cor-container); border-radius: 12px; }
+        .intro-screen h2 { font-size: 2.2rem; margin-bottom: 20px; }
+        .intro-screen p { font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px; color: #bdc3c7; }
+        #start-simulado-btn {
+            background-color: var(--cor-simulado);
+            color: var(--cor-texto);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #start-simulado-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--cor-simulado); }
+
+        .simulado-content { display: none; }
+        .area-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .tab-btn {
+            background-color: transparent;
+            color: var(--cor-texto);
+            border: 2px solid var(--cor-borda);
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active { background-color: var(--cor-destaque); border-color: var(--cor-destaque); }
+        .questions-area { display: none; }
+        .questions-area.active { display: block; }
+        
+        .question-card {
+            background-color: var(--cor-container);
+            border: 1px solid var(--cor-borda);
+            border-left: 4px solid var(--cor-destaque);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .question-card p { font-size: 1.1rem; margin-bottom: 20px; }
+        .options label {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .options label:hover { border-color: var(--cor-destaque); }
+        .options input { display: none; }
+        .options input:checked + span { font-weight: 700; color: var(--cor-destaque); }
+
+        #finish-simulado-btn {
+            display: block;
+            width: 100%;
+            background-color: var(--cor-simulado);
+            color: var(--cor-texto);
+            border: none;
+            padding: 15px 40px;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #finish-simulado-btn:hover { background-color: #c0392b; }
+
+        .results-screen { display: none; text-align: center; padding: 40px; background-color: var(--cor-container); border-radius: 12px; }
+        .results-screen h2 { font-size: 2.5rem; color: var(--cor-simulado); margin-bottom: 20px; }
+        .final-score { margin-bottom: 30px; }
+        .final-score p { font-size: 1.5rem; }
+        .final-score span { font-size: 4rem; font-weight: 700; color: var(--cor-destaque); }
+        .score-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 500px; margin: 0 auto; }
+        .score-area { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; }
+        .score-area h3 { font-size: 1.1rem; color: #bdc3c7; }
+        .score-area p { font-size: 1.5rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <canvas id="art-background"></canvas>
+    
+    <div class="container">
+        <header class="header">
+            <div>
+                <a href="menu.html" class="back-btn">Voltar ao Menu</a>
+            </div>
+            <h1>Simulado ENEM</h1>
+            <div class="timer-box">
+                <span>Tempo Restante</span>
+                <div id="timer">05:30:00</div>
+            </div>
+        </header>
+
+        <main>
+            <div id="intro-screen" class="intro-screen">
+                <h2>Prepare-se para o Desafio</h2>
+                <p>Este simulado contém 180 questões divididas entre as quatro áreas do conhecimento e simula o tempo oficial de prova de 5 horas e 30 minutos. Responda com atenção. O seu resultado será guardado e contará para o ranking.</p>
+                <button id="start-simulado-btn">Começar Simulado</button>
+            </div>
+
+            <div id="simulado-content" class="simulado-content">
+                <nav class="area-tabs">
+                    <button class="tab-btn active" data-area="linguagens">Linguagens (45)</button>
+                    <button class="tab-btn" data-area="humanas">Humanas (45)</button>
+                    <button class="tab-btn" data-area="natureza">Natureza (45)</button>
+                    <button class="tab-btn" data-area="matematica">Matemática (45)</button>
+                </nav>
+
+                <form id="simulado-form">
+                    <div id="area-linguagens" class="questions-area active">
+                        <div class="question-card">
+                            <p>Questão 1 (Linguagens): O que a palavra "concordância" significa na gramática normativa?</p>
+                            <div class="options">
+                                <label><input type="radio" name="ling_q1" value="A"><span>A) Relação entre o sujeito e o predicado.</span></label>
+                                <label><input type="radio" name="ling_q1" value="B"><span>B) Adaptação de um termo a outro em género, número e pessoa.</span></label>
+                                <label><input type="radio" name="ling_q1" value="C"><span>C) Ordem dos elementos na frase.</span></label>
+                                <label><input type="radio" name="ling_q1" value="D"><span>D) Uso correto dos sinais de pontuação.</span></label>
+                            </div>
+                        </div>
+                        <div class="question-card">
+                            <p>Questão 2 (Linguagens): Qual figura de linguagem consiste em substituir um termo por outro com o qual tem uma relação de proximidade, mas não de semelhança?</p>
+                            <div class="options">
+                                <label><input type="radio" name="ling_q2" value="A"><span>A) Metáfora</span></label>
+                                <label><input type="radio" name="ling_q2" value="B"><span>B) Comparação</span></label>
+                                <label><input type="radio" name="ling_q2" value="C"><span>C) Metonímia</span></label>
+                                <label><input type="radio" name="ling_q2" value="D"><span>D) Hipérbole</span></label>
+                            </div>
+                        </div>
+                         </div>
+
+                    <div id="area-humanas" class="questions-area">
+                        <div class="question-card">
+                            <p>Questão 1 (Humanas): Qual evento histórico marcou o início da Idade Média?</p>
+                            <div class="options">
+                                <label><input type="radio" name="hum_q1" value="A"><span>A) Queda do Império Romano do Ocidente (476 d.C.)</span></label>
+                                <label><input type="radio" name="hum_q1" value="B"><span>B) Início da Revolução Francesa (1789)</span></label>
+                                <label><input type="radio" name="hum_q1" value="C"><span>C) Descoberta da América (1492)</span></label>
+                                <label><input type="radio" name="hum_q1" value="D"><span>D) Nascimento de Cristo</span></label>
+                            </div>
+                        </div>
+                        </div>
+
+                    <div id="area-natureza" class="questions-area">
+                        <div class="question-card">
+                            <p>Questão 1 (Natureza): Qual o principal gás responsável pelo efeito estufa?</p>
+                            <div class="options">
+                                <label><input type="radio" name="nat_q1" value="A"><span>A) Oxigénio</span></label>
+                                <label><input type="radio" name="nat_q1" value="B"><span>B) Azoto</span></label>
+                                <label><input type="radio" name="nat_q1" value="C"><span>C) Dióxido de carbono</span></label>
+                                <label><input type="radio" name="nat_q1" value="D"><span>D) Hélio</span></label>
+                            </div>
+                        </div>
+                        </div>
+
+                    <div id="area-matematica" class="questions-area">
+                        <div class="question-card">
+                            <p>Questão 1 (Matemática): Se x + 5 = 10, qual o valor de x?</p>
+                            <div class="options">
+                                <label><input type="radio" name="mat_q1" value="A"><span>A) 2</span></label>
+                                <label><input type="radio" name="mat_q1" value="B"><span>B) 5</span></label>
+                                <label><input type="radio" name="mat_q1" value="C"><span>C) 10</span></label>
+                                <label><input type="radio" name="mat_q1" value="D"><span>D) 15</span></label>
+                            </div>
+                        </div>
+                        </div>
+
+                    <button type="button" id="finish-simulado-btn">Finalizar e Ver Resultado</button>
+                </form>
+            </div>
+
+            <div id="results-screen" class="results-screen">
+                <h2>Seu Desempenho</h2>
+                <div class="final-score">
+                    <p>Sua Nota Final (TRI)</p>
+                    <span id="tri-score">---</span>
+                </div>
+                <h3>Acertos por Área</h3>
+                <div class="score-details">
+                    <div class="score-area"><h3>Linguagens</h3><p id="linguagens-score">0/45</p></div>
+                    <div class="score-area"><h3>Humanas</h3><p id="humanas-score">0/45</p></div>
+                    <div class="score-area"><h3>Natureza</h3><p id="natureza-score">0/45</p></div>
+                    <div class="score-area"><h3>Matemática</h3><p id="matematica-score">0/45</p></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdvqFpKHpguqUcnkreu5nYotqtdDzzHY4",
+            authDomain: "evolucao-educacional.firebaseapp.com",
+            projectId: "evolucao-educacional",
+            storageBucket: "evolucao-educacional.appspot.com",
+            messagingSenderId: "841004951746",
+            appId: "1:841004951746:web:44a6f884840b35f415335b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lógica da UI
+            const startBtn = document.getElementById('start-simulado-btn');
+            const introScreen = document.getElementById('intro-screen');
+            const simuladoContent = document.getElementById('simulado-content');
+            const resultsScreen = document.getElementById('results-screen');
+            const finishBtn = document.getElementById('finish-simulado-btn');
+            const tabs = document.querySelectorAll('.tab-btn');
+            const areas = document.querySelectorAll('.questions-area');
+            const timerEl = document.getElementById('timer');
+            let timerInterval;
+
+            // Mapeamento das respostas corretas para o cálculo
+            const correctAnswers = {
+                // Linguagens
+                ling_q1: 'B',
+                ling_q2: 'C',
+                // ... adicione as restantes 43 respostas de linguagens
+                // Humanas
+                hum_q1: 'A',
+                // ... adicione as restantes 44 respostas de humanas
+                // Natureza
+                nat_q1: 'C',
+                // ... adicione as restantes 44 respostas de natureza
+                // Matemática
+                mat_q1: 'B',
+                // ... adicione as restantes 44 respostas de matemática
+            };
+
+            startBtn.addEventListener('click', () => {
+                introScreen.style.display = 'none';
+                simuladoContent.style.display = 'block';
+                startTimer(5 * 3600 + 30 * 60); // 5 horas e 30 minutos
+            });
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    areas.forEach(a => a.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(`area-${tab.dataset.area}`).classList.add('active');
+                });
+            });
+
+            finishBtn.addEventListener('click', () => {
+                if (confirm("Tem a certeza que deseja finalizar o simulado? Esta ação não pode ser desfeita.")) {
+                    clearInterval(timerInterval);
+                    calculateAndShowResults();
+                }
+            });
+
+            function startTimer(duration) {
+                let timer = duration, hours, minutes, seconds;
+                timerInterval = setInterval(() => {
+                    hours = parseInt(timer / 3600, 10);
+                    minutes = parseInt((timer % 3600) / 60, 10);
+                    seconds = parseInt(timer % 60, 10);
+
+                    hours = hours < 10 ? "0" + hours : hours;
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    timerEl.textContent = `${hours}:${minutes}:${seconds}`;
+
+                    if (--timer < 0) {
+                        clearInterval(timerInterval);
+                        alert("O tempo acabou!");
+                        calculateAndShowResults();
+                    }
+                }, 1000);
+            }
+
+            async function calculateAndShowResults() {
+                const simuladoForm = document.getElementById('simulado-form');
+                
+                let linguagensCorrect = 0;
+                let humanasCorrect = 0;
+                let naturezaCorrect = 0;
+                let matematicaCorrect = 0;
+
+                // Loop pelas respostas do utilizador e compara com as corretas
+                for (const questionName in correctAnswers) {
+                    const userAnswer = simuladoForm.querySelector(`input[name="${questionName}"]:checked`)?.value;
+                    const isCorrect = (userAnswer === correctAnswers[questionName]);
+
+                    if (questionName.startsWith('ling_') && isCorrect) linguagensCorrect++;
+                    if (questionName.startsWith('hum_') && isCorrect) humanasCorrect++;
+                    if (questionName.startsWith('nat_') && isCorrect) naturezaCorrect++;
+                    if (questionName.startsWith('mat_') && isCorrect) matematicaCorrect++;
+                }
+
+                const totalAcertos = linguagensCorrect + humanasCorrect + naturezaCorrect + matematicaCorrect;
+                const totalQuestions = Object.keys(correctAnswers).length;
+
+                // Simulação SIMPLIFICADA de cálculo TRI (muito básica para ser real, mas serve para o exemplo)
+                // A TRI real é extremamente complexa e exige um modelo estatístico.
+                // Esta é apenas uma aproximação linear para fins de demonstração.
+                const minScore = 300;
+                const maxScore = 900;
+                let triScore = minScore + ((totalAcertos / totalQuestions) * (maxScore - minScore));
+                
+                // Exibir resultados na UI
+                document.getElementById('linguagens-score').textContent = `${linguagensCorrect}/45`;
+                document.getElementById('humanas-score').textContent = `${humanasCorrect}/45`;
+                document.getElementById('natureza-score').textContent = `${naturezaCorrect}/45`;
+                document.getElementById('matematica-score').textContent = `${matematicaCorrect}/45`;
+                document.getElementById('tri-score').textContent = triScore.toFixed(1);
+
+                simuladoContent.style.display = 'none';
+                resultsScreen.style.display = 'block';
+
+                // Guardar resultado no Firestore
+                const user = auth.currentUser;
+                if (user) {
+                    const userRef = db.collection('users').doc(user.uid);
+                    await userRef.update({
+                        simulationScore: parseFloat(triScore.toFixed(1)),
+                        totalXp: firebase.firestore.FieldValue.increment(totalAcertos * 2) // Ganha 2 XP por acerto no simulado
+                    });
+                    console.log("Pontuação do simulado guardada e XP atualizado com sucesso!");
+                }
+            }
+        });
+
+        // --- Animação do Canvas (Fundo Espacial) ---
+        const canvas = document.getElementById('art-background');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+        function setCanvasSize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        setCanvasSize();
+        class Particle { constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 1.5 + 0.5; this.speedX = Math.random() * 2 - 1; this.speedY = Math.random() * 2 - 1; this.color = `hsl(${Math.random() * 360}, 70%, 50%)`; } update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width || this.x < 0) this.speedX *= -1; if (this.y > canvas.height || this.y < 0) this.speedY *= -1; } draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+        function init() { particlesArray = []; let n = (canvas.height * canvas.width) / 9000; for (let i = 0; i < n; i++) { particlesArray.push(new Particle()); } }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); } requestAnimationFrame(animate); }
+        init();
+        animate();
+        window.addEventListener('resize', () => { setCanvasSize(); init(); });
+    </script>
+</body>
+</html>

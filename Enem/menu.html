@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Evolução Educacional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cor-fundo: #0F0F1A;
+            --cor-texto: #EAEAEA;
+            --cor-container: rgba(26, 26, 46, 0.6);
+            --cor-borda: rgba(255, 255, 255, 0.1);
+            --cor-linguagens: #00A8FF;
+            --cor-humanas: #9C27B0;
+            --cor-natureza: #00BCD4;
+            --cor-matematica: #4CAF50;
+            --cor-ranking: #FFD700;
+            --cor-ofensiva: #FF4500;
+            --cor-simulado: #e74c3c;
+            --cor-provas: #1abc9c;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+        #art-background { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: -1; 
+        }
+        .user-stats-panel {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: var(--cor-container);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--cor-borda);
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 900px;
+            justify-content: space-around;
+            position: relative; /* Adicionado para garantir que fique sobre o fundo */
+            z-index: 1;
+        }
+        .stat-item { text-align: center; font-weight: 600; }
+        .stat-item span { font-size: 1.5rem; font-weight: 700; color: var(--cor-ofensiva); }
+        #checkin-btn {
+            background-color: var(--cor-ranking);
+            color: var(--cor-fundo);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        #checkin-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px var(--cor-ranking);
+        }
+        #checkin-btn:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 900px;
+            position: relative; /* Adicionado para garantir que fique sobre o fundo */
+            z-index: 1;
+        }
+        .special-missions { display: flex; flex-direction: column; gap: 20px; }
+        .mission-card {
+            background: var(--cor-container);
+            border: 1px solid var(--cor-borda);
+            border-radius: 16px;
+            padding: 20px;
+            text-decoration: none;
+            color: var(--cor-texto);
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .mission-card:hover { transform: scale(1.05); }
+        .mission-card h2 { font-size: 1.3rem; margin-bottom: 10px; }
+        #simulado-card { border-left: 5px solid var(--cor-simulado); }
+        #simulado-card:hover { border-color: var(--cor-simulado); box-shadow: 0 0 20px rgba(231, 76, 60, 0.5); }
+        #desafio-card { border-left: 5px solid var(--cor-ranking); }
+        #desafio-card:hover { border-color: var(--cor-ranking); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        #provas-card { border-left: 5px solid var(--cor-provas); }
+        #provas-card:hover { border-color: var(--cor-provas); box-shadow: 0 0 20px rgba(26, 188, 156, 0.5); }
+        .selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .area-card {
+            background: var(--cor-container);
+            border-radius: 16px;
+            border: 1px solid var(--cor-borda);
+            padding: 30px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-decoration: none;
+            color: var(--cor-texto);
+            transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .area-card .icon { width: 50px; height: 50px; stroke-width: 1.5; }
+        .area-card h3 { font-size: 1.1rem; font-weight: 600; text-align: center; }
+        .area-card:hover { transform: scale(1.05); }
+        #linguagens:hover { border-color: var(--cor-linguagens); box-shadow: 0 0 25px rgba(0, 168, 255, 0.5); }
+        #humanas:hover { border-color: var(--cor-humanas); box-shadow: 0 0 25px rgba(156, 39, 176, 0.5); }
+        #natureza:hover { border-color: var(--cor-natureza); box-shadow: 0 0 25px rgba(0, 188, 212, 0.5); }
+        #matematica:hover { border-color: var(--cor-matematica); box-shadow: 0 0 25px rgba(76, 175, 80, 0.5); }
+        #ranking:hover { border-color: var(--cor-ranking); box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); }
+        @media (max-width: 900px) {
+            .main-content { grid-template-columns: 1fr; }
+            .user-stats-panel { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="art-background"></canvas>
+    <div class="user-stats-panel">
+        <div class="stat-item">Ofensiva Diária<br><span id="day-streak-count">🔥 0</span></div>
+        <button id="checkin-btn" disabled>Carregando...</button>
+    </div>
+    
+    <div class="main-content">
+        <aside class="special-missions">
+            <a href="simulado.html" class="mission-card" id="simulado-card">
+                <h2>Simulado Completo</h2>
+                <p>Teste os seus conhecimentos com uma prova completa do ENEM.</p>
+            </a>
+            <a href="#" class="mission-card" id="desafio-card">
+                <h2>Desafio Diário</h2>
+                <p>Complete a sua meta de XP de hoje e ganhe recompensas.</p>
+            </a>
+            <a href="provas.html" class="mission-card" id="provas-card">
+                <h2>Provas e Vestibulares</h2>
+                <p>Acesse provas antigas do ENEM, FUVEST, FATEC e mais.</p>
+            </a>
+        </aside>
+
+        <main class="selection-grid">
+            <a href="linguagens.html" class="area-card" id="linguagens"><svg class="icon" style="stroke: var(--cor-linguagens);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg><h3>Linguagens</h3></a>
+            <a href="humanas.html" class="area-card" id="humanas"><svg class="icon" style="stroke: var(--cor-humanas);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h1a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.881 4.002l.07-.06a2 2 0 012.828 0l.07.06a1.65 1.65 0 002.332 0l.07-.06a2 2 0 012.828 0l.07.06a1.65 1.65 0 002.332 0l.07-.06a2 2 0 012.828 0l.07.06 1.652 1.651a2 2 0 010 2.828l-.06.07a1.65 1.65 0 000 2.332l.06.07a2 2 0 010 2.828l-.06.07a1.65 1.65 0 000 2.332l.06.07a2 2 0 010 2.828l-1.652 1.651a2 2 0 01-2.828 0l-.07-.06a1.65 1.65 0 00-2.332 0l-.07.06a2 2 0 01-2.828 0l-.07-.06a1.65 1.65 0 00-2.332 0l-.07.06a2 2 0 01-2.828 0l-1.652-1.651a2 2 0 010-2.828l.06-.07a1.65 1.65 0 000-2.332l-.06-.07a2 2 0 010-2.828l.06-.07a1.65 1.65 0 000-2.332l-.06-.07a2 2 0 010-2.828L6.229 4.062l.07-.06a1.65 1.65 0 002.332 0l.07-.06a2 2 0 012.828 0l.07.06a1.65 1.65 0 002.332 0z"></path></svg><h3>Ciências Humanas</h3></a>
+            <a href="natureza.html" class="area-card" id="natureza"><svg class="icon" style="stroke: var(--cor-natureza);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547a2 2 0 00-.547 1.806l.477 2.387a6 6 0 00.517 3.86l.158.318a6 6 0 00.517 3.86l2.387.477a2 2 0 001.806-.547a2 2 0 00.547-1.806l-.477-2.387a6 6 0 00-.517-3.86l-.158-.318a6 6 0 01-.517-3.86l-2.387-.477zM11.498 7.25a2 2 0 00-1.222.547l-2.387.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L.21 12.95a2 2 0 00-1.806.547 2 2 0 00-.547 1.806l.477 2.387a6 6 0 00.517 3.86l.158.318a6 6 0 00.517 3.86l2.387.477a2 2 0 001.806-.547a2 2 0 00.547-1.806l-.477-2.387a6 6 0 00-.517-3.86l-.158-.318a6 6 0 01-.517-3.86l2.387-.477a2 2 0 001.222-.547z"></path></svg><h3>Ciências da Natureza</h3></a>
+            <a href="matematica/aulas.html" class="area-card" id="matematica"><svg class="icon" style="stroke: var(--cor-matematica);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg><h3>Matemática</h3></a>
+            <a href="../Ranking/ranking.html" class="area-card" id="ranking" style="grid-column: 1 / -1;"><svg class="icon" style="stroke: var(--cor-ranking);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg><h3>Rankings e Ligas</h3></a>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script>
+        // A sua lógica de Firebase e check-in permanece exatamente a mesma
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdvqFpKHpguqUcnkreu5nYotqtdDzzHY4",
+            authDomain: "evolucao-educacional.firebaseapp.com",
+            projectId: "evolucao-educacional",
+            storageBucket: "evolucao-educacional.appspot.com",
+            messagingSenderId: "841004951746",
+            appId: "1:841004951746:web:44a6f884840b35f415335b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const dayStreakEl = document.getElementById('day-streak-count');
+        const checkinBtn = document.getElementById('checkin-btn');
+
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                const userRef = db.collection('users').doc(user.uid);
+                
+                userRef.onSnapshot(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        dayStreakEl.textContent = `🔥 ${userData.dayStreak || 0}`;
+
+                        const today = new Date().setHours(0, 0, 0, 0);
+                        const lastCheckin = userData.lastCheckin ? userData.lastCheckin.toDate().setHours(0, 0, 0, 0) : null;
+
+                        if (lastCheckin === today) {
+                            checkinBtn.textContent = 'Check-in Feito!';
+                            checkinBtn.disabled = true;
+                        } else {
+                            checkinBtn.textContent = 'Fazer Check-in';
+                            checkinBtn.disabled = false;
+                        }
+                    }
+                });
+            } else {
+                window.location.href = '../index.html';
+            }
+        });
+
+        checkinBtn.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            checkinBtn.disabled = true;
+            checkinBtn.textContent = 'Aguarde...';
+            const userRef = db.collection('users').doc(user.uid);
+            
+            try {
+                await db.runTransaction(async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists) throw "Documento do utilizador não encontrado.";
+                    
+                    const userData = userDoc.data();
+                    let newStreak = userData.dayStreak || 0;
+                    
+                    const today = new Date(); today.setHours(0, 0, 0, 0);
+                    const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); yesterday.setHours(0, 0, 0, 0);
+                    const lastCheckinDate = userData.lastCheckin ? userData.lastCheckin.toDate() : null;
+                    if(lastCheckinDate) { lastCheckinDate.setHours(0, 0, 0, 0); }
+
+                    if (lastCheckinDate && lastCheckinDate.getTime() === yesterday.getTime()) {
+                        newStreak++;
+                    } else {
+                        newStreak = 1;
+                    }
+
+                    const xpGain = 10;
+                    const newTotalXp = (userData.totalXp || 0) + xpGain;
+                    const newWeeklyXp = (userData.weeklyXp || 0) + xpGain;
+
+                    transaction.update(userRef, { 
+                        dayStreak: newStreak,
+                        lastCheckin: firebase.firestore.Timestamp.now(),
+                        totalXp: newTotalXp,
+                        weeklyXp: newWeeklyXp
+                    });
+                });
+            } catch (e) {
+                console.error("Erro no check-in:", e);
+                checkinBtn.disabled = false;
+            }
+        });
+
+    </script>
+    <script>
+        const canvas = document.getElementById('art-background');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = `hsl(${Math.random() * 60 + 200}, 70%, 50%)`;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 12000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            init();
+        });
+    </script>
+</body>
+</html>

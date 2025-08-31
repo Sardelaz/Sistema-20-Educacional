@@ -7,147 +7,227 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --cor-fundo: #0F0F1A;
-            --cor-texto: #EAEAEA;
-            --cor-container: rgba(26, 26, 46, 0.8);
-            --cor-borda: rgba(255, 255, 255, 0.15);
-            --cor-simulado: #e74c3c;
-            --cor-destaque: #00A8FF;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto);
-            overflow-y: auto;
-        }
-        /* Estilos do fundo animado */
-        #art-background { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: -1; 
-            background-color: var(--cor-fundo); /* Garante o fundo base */
-        }
+<style>
+    :root {
+        --cor-fundo: #0F0F1A;
+        --cor-texto: #EAEAEA;
+        --cor-container: rgba(26, 26, 46, 0.8);
+        --cor-borda: rgba(255, 255, 255, 0.15);
+        --cor-simulado: #e74c3c;
+        --cor-destaque: #00A8FF;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--cor-fundo);
+        color: var(--cor-texto);
+        overflow-y: auto;
+    }
+    #art-background { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        z-index: -1; 
+        background-color: var(--cor-fundo);
+    }
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px;
+        position: relative;
+        z-index: 0;
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background-color: var(--cor-container);
+        border-radius: 12px;
+        border: 1px solid var(--cor-borda);
+        margin-bottom: 30px;
+    }
+    /* Tipografia fluida com clamp(MIN, IDEAL, MAX) */
+    .header h1 { 
+        font-size: clamp(1.5rem, 4vw, 2rem); 
+        color: var(--cor-simulado); 
+    }
+    .timer-box { text-align: center; }
+    .timer-box #timer { 
+        font-size: clamp(2rem, 6vw, 2.5rem); 
+        font-weight: 700; 
+        color: var(--cor-destaque); 
+    }
+    .back-btn {
+        background: var(--cor-borda);
+        color: var(--cor-texto);
+        padding: 10px 20px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        white-space: nowrap; /* Impede que o texto do botão quebre linha */
+    }
+    .back-btn:hover { background-color: var(--cor-destaque); color: var(--cor-fundo); }
+
+    .intro-screen { 
+        text-align: center; 
+        padding: 50px 20px; 
+        background-color: var(--cor-container); 
+        border-radius: 12px; 
+    }
+    .intro-screen h2 { 
+        font-size: clamp(1.8rem, 5vw, 2.2rem); 
+        margin-bottom: 20px; 
+    }
+    .intro-screen p { 
+        font-size: 1.1rem; 
+        max-width: 600px; 
+        margin: 0 auto 30px; 
+        color: #bdc3c7; 
+    }
+    #start-simulado-btn {
+        background-color: var(--cor-simulado);
+        color: var(--cor-texto);
+        border: none;
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    #start-simulado-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--cor-simulado); }
+
+    .simulado-content { display: none; }
+    .area-tabs { 
+        display: flex; 
+        justify-content: center; 
+        flex-wrap: wrap; /* Permite que os botões quebrem a linha */
+        gap: 10px; 
+        margin-bottom: 30px; 
+    }
+    .tab-btn {
+        background-color: transparent;
+        color: var(--cor-texto);
+        border: 2px solid var(--cor-borda);
+        padding: 10px 25px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .tab-btn.active { background-color: var(--cor-destaque); border-color: var(--cor-destaque); }
+    .questions-area { display: none; }
+    .questions-area.active { display: block; }
+    
+    .question-card {
+        background-color: var(--cor-container);
+        border: 1px solid var(--cor-borda);
+        border-left: 4px solid var(--cor-destaque);
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    .question-card p { font-size: 1.1rem; margin-bottom: 20px; }
+    .options label {
+        display: block;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+    }
+    .options label:hover { border-color: var(--cor-destaque); }
+    .options input { display: none; }
+    .options input:checked + span { font-weight: 700; color: var(--cor-destaque); }
+
+    #finish-simulado-btn {
+        display: block;
+        width: 100%;
+        background-color: var(--cor-simulado);
+        color: var(--cor-texto);
+        border: none;
+        padding: 15px 40px;
+        margin-top: 30px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    #finish-simulado-btn:hover { background-color: #c0392b; }
+
+    .results-screen { display: none; text-align: center; padding: 40px; background-color: var(--cor-container); border-radius: 12px; }
+    .results-screen h2 { 
+        font-size: clamp(2rem, 6vw, 2.5rem); 
+        color: var(--cor-simulado); 
+        margin-bottom: 20px; 
+    }
+    .final-score { margin-bottom: 30px; }
+    .final-score p { font-size: 1.5rem; }
+    .final-score span { 
+        font-size: clamp(3rem, 12vw, 4rem); 
+        font-weight: 700; 
+        color: var(--cor-destaque); 
+    }
+    .score-details { 
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 20px; 
+        max-width: 500px; 
+        margin: 0 auto; 
+    }
+    .score-area { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; }
+    .score-area h3 { font-size: 1.1rem; color: #bdc3c7; }
+    .score-area p { font-size: 1.5rem; font-weight: 600; }
+
+    /* --- Media Queries para Responsividade --- */
+
+    /* Para Tablets e telas médias (até 768px) */
+    @media (max-width: 768px) {
         .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px;
-            position: relative; /* Para garantir que o conteúdo fique acima do canvas */
-            z-index: 0;
+            padding: 20px;
         }
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: var(--cor-container);
-            border-radius: 12px;
-            border: 1px solid var(--cor-borda);
-            margin-bottom: 30px;
+            flex-direction: column;
+            gap: 20px;
         }
-        .header h1 { font-size: 2rem; color: var(--cor-simulado); }
-        .timer-box { text-align: center; }
-        .timer-box #timer { font-size: 2.5rem; font-weight: 700; color: var(--cor-destaque); }
-        .back-btn {
-            background: var(--cor-borda);
-            color: var(--cor-texto);
-            padding: 10px 20px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
+        .score-details {
+            grid-template-columns: 1fr;
         }
-        .back-btn:hover { background-color: var(--cor-destaque); color: var(--cor-fundo); }
+    }
 
-        .intro-screen { text-align: center; padding: 50px 20px; background-color: var(--cor-container); border-radius: 12px; }
-        .intro-screen h2 { font-size: 2.2rem; margin-bottom: 20px; }
-        .intro-screen p { font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px; color: #bdc3c7; }
-        #start-simulado-btn {
-            background-color: var(--cor-simulado);
-            color: var(--cor-texto);
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        #start-simulado-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--cor-simulado); }
-
-        .simulado-content { display: none; }
-        .area-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
-        .tab-btn {
-            background-color: transparent;
-            color: var(--cor-texto);
-            border: 2px solid var(--cor-borda);
-            padding: 10px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .tab-btn.active { background-color: var(--cor-destaque); border-color: var(--cor-destaque); }
-        .questions-area { display: none; }
-        .questions-area.active { display: block; }
-        
-        .question-card {
-            background-color: var(--cor-container);
-            border: 1px solid var(--cor-borda);
-            border-left: 4px solid var(--cor-destaque);
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-        .question-card p { font-size: 1.1rem; margin-bottom: 20px; }
-        .options label {
-            display: block;
-            background: rgba(255, 255, 255, 0.05);
+    /* Para Celulares (até 480px) */
+    @media (max-width: 480px) {
+        .container {
             padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s ease;
         }
-        .options label:hover { border-color: var(--cor-destaque); }
-        .options input { display: none; }
-        .options input:checked + span { font-weight: 700; color: var(--cor-destaque); }
-
-        #finish-simulado-btn {
-            display: block;
-            width: 100%;
-            background-color: var(--cor-simulado);
-            color: var(--cor-texto);
-            border: none;
-            padding: 15px 40px;
-            margin-top: 30px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .header {
+            padding: 15px;
         }
-        #finish-simulado-btn:hover { background-color: #c0392b; }
-
-        .results-screen { display: none; text-align: center; padding: 40px; background-color: var(--cor-container); border-radius: 12px; }
-        .results-screen h2 { font-size: 2.5rem; color: var(--cor-simulado); margin-bottom: 20px; }
-        .final-score { margin-bottom: 30px; }
-        .final-score p { font-size: 1.5rem; }
-        .final-score span { font-size: 4rem; font-weight: 700; color: var(--cor-destaque); }
-        .score-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 500px; margin: 0 auto; }
-        .score-area { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; }
-        .score-area h3 { font-size: 1.1rem; color: #bdc3c7; }
-        .score-area p { font-size: 1.5rem; font-weight: 600; }
-    </style>
+        .intro-screen {
+            padding: 30px 15px;
+        }
+        .tab-btn {
+            padding: 8px 18px;
+            font-size: 0.9rem;
+        }
+        .question-card {
+            padding: 20px 15px;
+        }
+        .results-screen {
+            padding: 25px 15px;
+        }
+    }
+</style>
 </head>
 <body>
     <canvas id="art-background"></canvas>

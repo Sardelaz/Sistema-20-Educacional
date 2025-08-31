@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redações | Evolução Educacional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cor-fundo: #0F0F1A;
+            --cor-texto: #EAEAEA;
+            --cor-texto-secundario: #bdc3c7;
+            --cor-container: rgba(26, 26, 46, 0.7);
+            --cor-borda: rgba(255, 255, 255, 0.1);
+            --cor-redacao: #8e44ad;
+            --cor-enem: #FFD700;
+            --cor-fuvest: #00A8FF;
+            --cor-unicamp: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            padding: 20px;
+        }
+
+        #art-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background-color: var(--cor-container);
+            color: var(--cor-texto);
+            border: 1px solid var(--cor-borda);
+            padding: 0.6rem 1.1rem;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background-color: var(--cor-borda);
+            transform: scale(1.05);
+        }
+
+        header {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: clamp(2.2rem, 5vw, 2.8rem);
+            font-weight: 700;
+            color: var(--cor-redacao);
+        }
+
+        header p {
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            color: var(--cor-texto-secundario);
+            max-width: 600px;
+            margin: 10px auto 0;
+        }
+
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .theme-card {
+            background: var(--cor-container);
+            border: 1px solid var(--cor-borda);
+            border-left: 5px solid var(--cor-redacao);
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .theme-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 25px color-mix(in srgb, var(--cor-redacao), transparent 60%);
+        }
+
+        .theme-header {
+            margin-bottom: 20px;
+        }
+
+        .theme-source {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--cor-fundo);
+        }
+
+        .theme-source.enem { background-color: var(--cor-enem); }
+        .theme-source.fuvest { background-color: var(--cor-fuvest); }
+        .theme-source.unicamp { background-color: var(--cor-unicamp); }
+
+        .theme-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        .theme-body {
+            flex-grow: 1; /* Faz esta área crescer para empurrar o botão para baixo */
+        }
+
+        .theme-body h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--cor-texto-secundario);
+            margin-bottom: 10px;
+        }
+        
+        .theme-body .text-preview {
+            font-size: 0.95rem;
+            color: #aab;
+            line-height: 1.6;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+        }
+        
+        .text-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(to bottom, transparent, var(--cor-container));
+        }
+
+        .practice-btn {
+            display: block;
+            background-color: var(--cor-redacao);
+            color: var(--cor-texto);
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .practice-btn:hover {
+            background-color: color-mix(in srgb, var(--cor-redacao), white 20%);
+            transform: scale(1.03);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .back-btn {
+                top: 1rem;
+                left: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body { padding: 15px; }
+            .themes-grid {
+                 grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <canvas id="art-background"></canvas>
+    
+    <div class="container">
+        <a href="menu.html" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>Voltar</span>
+        </a>
+
+        <header>
+            <h1>Temas de Redação</h1>
+            <p>Pratique com temas de vestibulares passados e propostas atuais para aprimorar sua escrita e argumentação.</p>
+        </header>
+
+        <main class="themes-grid">
+            <div class="theme-card">
+                <div class="theme-header">
+                    <span class="theme-source enem">ENEM 2023</span>
+                    <h2>Desafios para o enfrentamento da invisibilidade do trabalho de cuidado realizado pela mulher no Brasil</h2>
+                </div>
+                <div class="theme-body">
+                    <h3>Textos Motivadores</h3>
+                    <div class="text-preview">
+                        A questão do trabalho de cuidado, majoritariamente exercido por mulheres, tem sido pauta de discussões em diversas esferas sociais. A invisibilidade e a desvalorização dessas atividades...
+                    </div>
+                </div>
+                <a href="#" class="practice-btn">Praticar Redação</a>
+            </div>
+
+            <div class="theme-card">
+                <div class="theme-header">
+                    <span class="theme-source fuvest">FUVEST 2023</span>
+                    <h2>Refugiados ambientais e vulnerabilidade social</h2>
+                </div>
+                <div class="theme-body">
+                     <h3>Textos Motivadores</h3>
+                     <div class="text-preview">
+                       As mudanças climáticas intensificam eventos extremos, forçando o deslocamento de populações. Esses "refugiados ambientais" enfrentam uma dupla vulnerabilidade: a perda de seu lar e a dificuldade...
+                    </div>
+                </div>
+                <a href="#" class="practice-btn">Praticar Redação</a>
+            </div>
+
+            <div class="theme-card">
+                <div class="theme-header">
+                    <span class="theme-source enem">ENEM 2022</span>
+                    <h2>Desafios para a valorização de comunidades e povos tradicionais no Brasil</h2>
+                </div>
+                 <div class="theme-body">
+                    <h3>Textos Motivadores</h3>
+                     <div class="text-preview">
+                        O Brasil é um país de vasta diversidade cultural, abrigando inúmeras comunidades e povos tradicionais. No entanto, a preservação de suas culturas, territórios e modos de vida enfrenta constantes...
+                    </div>
+                </div>
+                <a href="#" class="practice-btn">Praticar Redação</a>
+            </div>
+            
+            <div class="theme-card">
+                <div class="theme-header">
+                    <span class="theme-source unicamp">UNICAMP 2024</span>
+                    <h2>Exclusão digital e suas consequências na sociedade brasileira contemporânea</h2>
+                </div>
+                 <div class="theme-body">
+                    <h3>Textos Motivadores</h3>
+                     <div class="text-preview">
+                        Apesar da crescente digitalização, uma parcela significativa da população brasileira ainda se encontra à margem do mundo digital. A exclusão digital não se limita à falta de acesso à internet, mas também...
+                    </div>
+                </div>
+                <a href="#" class="practice-btn">Praticar Redação</a>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // --- Animação do Canvas (Fundo) ---
+        const canvas = document.getElementById('art-background');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+        function setCanvasSize() { canvas.width = window.innerWidth; canvas.height = document.body.scrollHeight; }
+        setCanvasSize();
+        class Particle { constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 1.5 + 0.5; this.speedX = Math.random() * 0.5 - 0.25; this.speedY = Math.random() * 0.5 - 0.25; this.color = `hsl(${Math.random() * 60 + 220}, 70%, 50%)`; } update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width || this.x < 0) {this.x = Math.random() * canvas.width;} if (this.y > canvas.height || this.y < 0) {this.y = Math.random() * canvas.height;} } draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+        function init() { particlesArray = []; let numberOfParticles = (canvas.width * canvas.height) / 15000; for (let i = 0; i < numberOfParticles; i++) { particlesArray.push(new Particle()); } }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); } requestAnimationFrame(animate); }
+        init();
+        animate();
+        window.addEventListener('resize', () => { setCanvasSize(); init(); });
+    </script>
+</body>
+
+</html>
